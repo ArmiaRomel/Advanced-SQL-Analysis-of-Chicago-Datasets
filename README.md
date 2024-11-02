@@ -1,4 +1,4 @@
-# Advanced-SQL-Analysis-of-Chicago-Datasets
+# Advanced SQL Analysis of Chicago Datasets
 
 ## Project Overview
 
