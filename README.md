@@ -28,5 +28,4 @@ This project showcases advanced SQL skills through the analysis of real-life dat
 - [City of Chicago's Data Portal](https://data.cityofchicago.org/)
 - [Socioeconomic Indicators in Chicago - Original Dataset](https://data.cityofchicago.org/Health-Human-Services/Census-Data-Selected-socioeconomic-indicators-in-C/kn9c-c2s2)
 - [Chicago Public Schools - Original Dataset](https://data.cityofchicago.org/Education/Chicago-Public-Schools-Progress-Report-Cards-2011-/9xs2-f89t)
-- [Chicago Crime Data - Original Dataset]()
-- [Subsets of the 3 Datasets](https://data.cityofchicago.org/Public-Safety/Crimes-2001-to-present/ijzp-q8t2)
+- [Chicago Crime Data - Original Dataset](https://data.cityofchicago.org/Public-Safety/Crimes-2001-to-present/ijzp-q8t2)
