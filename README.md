@@ -47,13 +47,10 @@ SELECT * FROM CENSUS_DATA LIMIT 5;
 SELECT * FROM CHICAGO_PUBLIC_SCHOOLS LIMIT 5;
 ```
 
-<details>
-<summary>Click to view full school data table</summary>
-
-| School_ID | NAME_OF_SCHOOL | Elementary, Middle, or High School | ... |
-|-----------|----------------|-------------------------------------|-----|
-| 610038 | Abraham Lincoln Elementary School | ES | ... |
-</details>
+| School_ID | NAME_OF_SCHOOL | Elementary, Middle, or High School | Street_Address | City | State | ZIP_Code | Phone_Number | Safety_Icon | SAFETY_SCORE | AVERAGE_STUDENT_ATTENDANCE | Gr3_5_Grade_Level_Math__ | Gr3_5_Grade_Level_Read__ | Gr6_8_Grade_Level_Math__ | Gr6_8_Grade_Level_Read__ | Graduation_Rate__ | ... |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| 610038 | Abraham Lincoln Elementary School | ES | 615 W Kemper Pl | Chicago | IL | 60614 | (773) 534-5720 | Very Strong | 99.0 | 96.00% | 89.6 | 84.9 | 81.9 | 85.2 | NDA | ... |
+| 610281 | Adam Clayton Powell Paideia Community Academy Elementary School | ES | 7511 S South Shore Dr | Chicago | IL | 60649 | (773) 535-6650 | Average | 54.0 | 95.60% | 21.9 | 15.1 | 38.5 | 27.4 | NDA | ... |
 
 ### 3. Chicago Crime Data
 
