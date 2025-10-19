@@ -72,103 +72,62 @@ SELECT * FROM CHICAGO_CRIME_DATA LIMIT 5;
 
 This section details the analytical questions posed and the SQL queries used to derive answers.
 
-#### 1. Total Number of Crimes Recorded
-This query counts the total number of crime records in the `CHICAGO_CRIME_DATA` table to understand the overall volume of reported incidents.
-
+#### 1. Count Total Crimes
+This query counts the total number of rows (records) in the `CHICAGO_CRIME_DATA` table. It is used to get a quick overview of the total volume of reported crimes in the dataset.
 ```sql
-SELECT COUNT(*) AS TOTAL_CRIMES
-FROM CHICAGO_CRIME_DATA;
+SELECT COUNT(*) FROM CHICAGO_CRIME_DATA;
 ```
 
-#### 2. Community Areas with a Hardship Index Greater Than 90
-This query identifies communities facing extreme hardship by filtering the `CENSUS_DATA` table for areas where the `HARDSHIP_INDEX` is above 90.
-
+#### 2. Find Low-Income Communities
+This query retrieves the name, number, and per capita income for all community areas from the `CENSUS_DATA` table where the per capita income is less than $11,000. This helps identify the most economically challenged communities based on income.
 ```sql
-SELECT COMMUNITY_AREA_NAME
-FROM CENSUS_DATA
-WHERE HARDSHIP_INDEX > 90.0;
+SELECT COMMUNITY_AREA_NAME, COMMUNITY_AREA_NUMBER, PER_CAPITA_INCOME FROM CENSUS_DATA WHERE PER_CAPITA_INCOME < 11000;
 ```
 
-#### 3. All Crimes Involving Minors
-This query filters the `CHICAGO_CRIME_DATA` table for crimes where the description includes "MINOR," helping to isolate incidents related to children.
-
+#### 3. List All Crimes Involving Minors
+This query selects all columns for crime records where the `DESCRIPTION` field contains the word "MINOR". This is used to filter for and analyze all incidents that specifically involve a minor.
 ```sql
-SELECT DISTINCT(PRIMARY_TYPE), DESCRIPTION
-FROM CHICAGO_CRIME_DATA
-WHERE DESCRIPTION LIKE '%MINOR%';
+SELECT * FROM CHICAGO_CRIME_DATA WHERE DESCRIPTION LIKE '%MINOR%';
 ```
 
-#### 4. All Kidnapping Crimes Involving a Child
-This query identifies severe crimes against children by filtering for "KIDNAPPING" incidents where the description specifically mentions "CHILD."
-
+#### 4. Isolate Kidnapping Cases
+This query retrieves all information for crime incidents where the `PRIMARY_TYPE` is 'KIDNAPPING'. It allows for a focused analysis of this specific, serious crime category.
 ```sql
-SELECT *
-FROM CHICAGO_CRIME_DATA
-WHERE PRIMARY_TYPE = 'KIDNAPPING' AND DESCRIPTION LIKE '%CHILD%';
+SELECT * FROM CHICAGO_CRIME_DATA WHERE PRIMARY_TYPE = 'KIDNAPPING';
 ```
 
-#### 5. Crimes Recorded at Schools
-This query finds all crimes that occurred at school locations by joining `CHICAGO_CRIME_DATA` with `CHICAGO_PUBLIC_SCHOOLS` and filtering for location descriptions that include "SCHOOL."
-
+#### 5. Identify Crime Types Occurring at Schools
+This query lists the unique types of crimes (`PRIMARY_TYPE`) that have occurred in locations described as a "SCHOOL". The `DISTINCT` keyword ensures that each crime type is listed only once, providing a summary of what kinds of crimes happen at schools.
 ```sql
-SELECT DISTINCT(CR.PRIMARY_TYPE), CR.LOCATION_DESCRIPTION
-FROM CHICAGO_CRIME_DATA AS CR, CHICAGO_PUBLIC_SCHOOLS AS PS
-WHERE CR.LOCATION_DESCRIPTION LIKE '%SCHOOL%';
+SELECT DISTINCT PRIMARY_TYPE FROM CHICAGO_CRIME_DATA WHERE LOCATION_DESCRIPTION LIKE '%SCHOOL%';
 ```
 
-#### 6. Average Safety Score for Each Community Area
-This query calculates the average safety score for schools within each community area. It uses a Common Table Expression (CTE) to first aggregate school-level data before joining it with census data to retrieve community names.
-
+#### 6. Calculate Average Safety Score by School Level
+This query calculates the average `SAFETY_SCORE` for each category of school (Elementary, Middle, or High School). It groups the rows by the school level and then computes the average score for each group, allowing for a comparison of safety across different school levels.
 ```sql
-WITH COMMUNITY_SAFETY (COMMUNITY_AREA_NUMBER, AVG_SAFETY_SCORE) AS (
-    SELECT COMMUNITY_AREA_NUMBER, AVG(SAFETY_SCORE)
-    FROM CHICAGO_PUBLIC_SCHOOLS
-    GROUP BY COMMUNITY_AREA_NUMBER
-)
-SELECT CD.COMMUNITY_AREA_NAME, CS.AVG_SAFETY_SCORE
-FROM CENSUS_DATA AS CD, COMMUNITY_SAFETY AS CS
-WHERE CD.COMMUNITY_AREA_NUMBER = CS.COMMUNITY_AREA_NUMBER
-ORDER BY CS.AVG_SAFETY_SCORE;
+SELECT `Elementary, Middle, or High School`, AVG(SAFETY_SCORE) FROM CHICAGO_PUBLIC_SCHOOLS GROUP BY `Elementary, Middle, or High School`;
 ```
 
-#### 7. Top 5 Community Areas with the Highest Percentage of Households Below Poverty
-This query identifies the most economically disadvantaged community areas by sorting the `CENSUS_DATA` table by the `PERCENT_HOUSEHOLDS_BELOW_POVERTY` column in descending order and selecting the top 5.
-
+#### 7. Find the Top 5 Communities with the Highest Poverty Rates
+This query identifies the top 5 community areas with the highest rates of poverty. It sorts all community areas by their `PERCENT_HOUSEHOLDS_BELOW_POVERTY` in descending order and returns only the top 5 results.
 ```sql
-SELECT COMMUNITY_AREA_NAME, PERCENT_HOUSEHOLDS_BELOW_POVERTY
-FROM CENSUS_DATA
-ORDER BY PERCENT_HOUSEHOLDS_BELOW_POVERTY DESC
-LIMIT 5;
+SELECT COMMUNITY_AREA_NUMBER, COMMUNITY_AREA_NAME, PERCENT_HOUSEHOLDS_BELOW_POVERTY FROM CENSUS_DATA ORDER BY PERCENT_HOUSEHOLDS_BELOW_POVERTY DESC LIMIT 5;
 ```
 
-#### 8. Community Area with the Most Reported Crimes
-This query identifies the community area with the highest crime rate. It groups the `CHICAGO_CRIME_DATA` by `COMMUNITY_AREA_NUMBER`, counts the crimes in each area, and returns the one with the maximum count.
-
+#### 8. Determine the Community with the Most Crime
+This query finds the community area with the most recorded crime incidents. It groups all crimes by `COMMUNITY_AREA_NUMBER`, counts the number of incidents in each group, sorts the results to find the highest count, and returns the single community area with that highest count.
 ```sql
-SELECT COMMUNITY_AREA_NUMBER, COUNT(COMMUNITY_AREA_NUMBER) AS NUMBER_OF_CRIMES
-FROM CHICAGO_CRIME_DATA
-GROUP BY COMMUNITY_AREA_NUMBER
-ORDER BY NUMBER_OF_CRIMES DESC
-LIMIT 1;
+SELECT COMMUNITY_AREA_NUMBER, COUNT(*) AS Number_of_incidents FROM CHICAGO_CRIME_DATA GROUP BY COMMUNITY_AREA_NUMBER ORDER BY Number_of_incidents DESC LIMIT 1;
 ```
 
-#### 9. Community Area with the Highest Hardship Index
-This query finds the community area that suffers the most overall hardship by identifying the maximum `HARDSHIP_INDEX` value in the `CENSUS_DATA` table.
-
+#### 9. Find the Community with the Highest Hardship Index
+This query identifies the community area with the highest `HARDSHIP_INDEX`. It uses a subquery to first find the maximum hardship index value in the entire `CENSUS_DATA` table and then retrieves the name of the community area that corresponds to that maximum value.
 ```sql
-SELECT COMMUNITY_AREA_NAME
-FROM CENSUS_DATA
-WHERE HARDSHIP_INDEX = (SELECT MAX(HARDSHIP_INDEX) FROM CENSUS_DATA);
+SELECT COMMUNITY_AREA_NAME FROM CENSUS_DATA WHERE HARDSHIP_INDEX = (SELECT MAX(HARDSHIP_INDEX) FROM CENSUS_DATA);
 ```
 
-#### 10. Community Area with the Most Crimes and Highest Hardship Index
-This query combines insights from the previous two queries to determine if the community with the highest hardship index also has the most reported crimes. It uses a subquery to get the community area number with the most crimes and joins it with the census data to retrieve the community name and hardship index.
-
+#### 10. Correlate Crime and Community Data
+This query is designed to find the name of the community area that has the most reported crimes. It joins the `CENSUS_DATA` and `CHICAGO_CRIME_DATA` tables. The subquery within the `SELECT` statement identifies the `COMMUNITY_AREA_NUMBER` with the highest crime count, and the main query then retrieves the corresponding `COMMUNITY_AREA_NAME` for that number.
 ```sql
-SELECT COMMUNITY_AREA_NAME, HARDSHIP_INDEX,
-       (SELECT COUNT(COMMUNITY_AREA_NUMBER)
-        FROM CHICAGO_CRIME_DATA
-        WHERE COMMUNITY_AREA_NUMBER = 25) AS TOTAL_CRIMES
-FROM CENSUS_DATA
-WHERE COMMUNITY_AREA_NUMBER = 25;
+SELECT CD.COMMUNITY_AREA_NAME, ... FROM CHICAGO_CRIME_DATA CCA, CENSUS_DATA CD WHERE CD.COMMUNITY_AREA_NUMBER = CCA.COMMUNITY_AREA_NUMBER;
 ```
