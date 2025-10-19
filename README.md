@@ -74,60 +74,123 @@ This section details the analytical questions posed and the SQL queries used to 
 
 #### 1. Count Total Crimes
 This query counts the total number of rows (records) in the `CHICAGO_CRIME_DATA` table. It is used to get a quick overview of the total volume of reported crimes in the dataset.
+
 ```sql
 SELECT COUNT(*) FROM CHICAGO_CRIME_DATA;
 ```
 
+| COUNT(*) |
+| :--- |
+| 533 |
+
+---
 #### 2. Find Low-Income Communities
 This query retrieves the name, number, and per capita income for all community areas from the `CENSUS_DATA` table where the per capita income is less than $11,000. This helps identify the most economically challenged communities based on income.
 ```sql
 SELECT COMMUNITY_AREA_NAME, COMMUNITY_AREA_NUMBER, PER_CAPITA_INCOME FROM CENSUS_DATA WHERE PER_CAPITA_INCOME < 11000;
 ```
+| COMMUNITY_AREA_NAME | COMMUNITY_AREA_NUMBER | PER_CAPITA_INCOME |
+| :--- | :--- | :--- |
+| West Garfield Park | 26.0 | 10934 |
+| South Lawndale | 30.0 | 10402 |
+| Fuller Park | 37.0 | 10432 |
+| Riverdale | 54.0 | 8201 |
 
+---
 #### 3. List All Crimes Involving Minors
 This query selects all columns for crime records where the `DESCRIPTION` field contains the word "MINOR". This is used to filter for and analyze all incidents that specifically involve a minor.
 ```sql
 SELECT * FROM CHICAGO_CRIME_DATA WHERE DESCRIPTION LIKE '%MINOR%';
 ```
+| ID | CASE_NUMBER | DATE | BLOCK | IUCR | PRIMARY_TYPE | DESCRIPTION | LOCATION_DESCRIPTION | ARREST | DOMESTIC | .. |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| 3987219 | HL266884 | 2005-03-31 | 024XX N CLARK ST | 2210 | LIQUOR LAW VIOLATION | SELL/GIVE/DEL LIQUOR TO MINOR | CONVENIENCE STORE | 1 | 0 | .. |
+| 3266814 | HK238408 | 2004-03-13 | 093XX S STONY ISLAND AVE | 2230 | LIQUOR LAW VIOLATION | ILLEGAL CONSUMPTION BY MINOR | ALLEY | 1 | 0 | .. |
 
+---
 #### 4. Isolate Kidnapping Cases
 This query retrieves all information for crime incidents where the `PRIMARY_TYPE` is 'KIDNAPPING'. It allows for a focused analysis of this specific, serious crime category.
 ```sql
 SELECT * FROM CHICAGO_CRIME_DATA WHERE PRIMARY_TYPE = 'KIDNAPPING';
 ```
+| ID | CASE_NUMBER | DATE | BLOCK | IUCR | PRIMARY_TYPE | DESCRIPTION | LOCATION_DESCRIPTION | ARREST | DOMESTIC | .. |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| 5276766 | HN144152 | 2007-01-26 | 050XX W VAN BUREN ST | 1792 | KIDNAPPING | CHILD ABDUCTION/STRANGER | STREET | 0 | 0 | .. |
 
+---
 #### 5. Identify Crime Types Occurring at Schools
 This query lists the unique types of crimes (`PRIMARY_TYPE`) that have occurred in locations described as a "SCHOOL". The `DISTINCT` keyword ensures that each crime type is listed only once, providing a summary of what kinds of crimes happen at schools.
 ```sql
 SELECT DISTINCT PRIMARY_TYPE FROM CHICAGO_CRIME_DATA WHERE LOCATION_DESCRIPTION LIKE '%SCHOOL%';
 ```
+| PRIMARY_TYPE |
+| :--- |
+| BATTERY |
+| CRIMINAL DAMAGE |
+| NARCOTICS |
+| ASSAULT |
+| CRIMINAL TRESPASS |
+| PUBLIC PEACE VIOLATION |
 
+---
 #### 6. Calculate Average Safety Score by School Level
 This query calculates the average `SAFETY_SCORE` for each category of school (Elementary, Middle, or High School). It groups the rows by the school level and then computes the average score for each group, allowing for a comparison of safety across different school levels.
 ```sql
 SELECT `Elementary, Middle, or High School`, AVG(SAFETY_SCORE) FROM CHICAGO_PUBLIC_SCHOOLS GROUP BY `Elementary, Middle, or High School`;
 ```
+| Elementary, Middle, or High School | AVG(SAFETY_SCORE) |
+| :--- | :--- |
+| ES | 49.52038369304557 |
+| HS | 49.62352941176471 |
+| MS | 48.0 |
 
-#### 7. Find the Top 5 Communities with the Highest Poverty Rates
+---
+#### 7. Find the Top 5 Communities with Highest Poverty Rates
 This query identifies the top 5 community areas with the highest rates of poverty. It sorts all community areas by their `PERCENT_HOUSEHOLDS_BELOW_POVERTY` in descending order and returns only the top 5 results.
 ```sql
 SELECT COMMUNITY_AREA_NUMBER, COMMUNITY_AREA_NAME, PERCENT_HOUSEHOLDS_BELOW_POVERTY FROM CENSUS_DATA ORDER BY PERCENT_HOUSEHOLDS_BELOW_POVERTY DESC LIMIT 5;
 ```
+| COMMUNITY_AREA_NUMBER | COMMUNITY_AREA_NAME | PERCENT_HOUSEHOLDS_BELOW_POVERTY |
+| :--- | :--- | :--- |
+| 54.0 | Riverdale | 56.5 |
+| 37.0 | Fuller Park | 51.2 |
+| 68.0 | Englewood | 46.6 |
+| 29.0 | North Lawndale | 43.1 |
+| 27.0 | East Garfield Park | 42.4 |
 
+---
 #### 8. Determine the Community with the Most Crime
 This query finds the community area with the most recorded crime incidents. It groups all crimes by `COMMUNITY_AREA_NUMBER`, counts the number of incidents in each group, sorts the results to find the highest count, and returns the single community area with that highest count.
 ```sql
 SELECT COMMUNITY_AREA_NUMBER, COUNT(*) AS Number_of_incidents FROM CHICAGO_CRIME_DATA GROUP BY COMMUNITY_AREA_NUMBER ORDER BY Number_of_incidents DESC LIMIT 1;
 ```
+| COMMUNITY_AREA_NUMBER | Number_of_incidents |
+| :--- | :--- |
+| 25.0 | 43 |
 
+---
 #### 9. Find the Community with the Highest Hardship Index
 This query identifies the community area with the highest `HARDSHIP_INDEX`. It uses a subquery to first find the maximum hardship index value in the entire `CENSUS_DATA` table and then retrieves the name of the community area that corresponds to that maximum value.
 ```sql
 SELECT COMMUNITY_AREA_NAME FROM CENSUS_DATA WHERE HARDSHIP_INDEX = (SELECT MAX(HARDSHIP_INDEX) FROM CENSUS_DATA);
 ```
+| COMMUNITY_AREA_NAME |
+| :--- |
+| Riverdale |
 
+---
 #### 10. Correlate Crime and Community Data
 This query is designed to find the name of the community area that has the most reported crimes. It joins the `CENSUS_DATA` and `CHICAGO_CRIME_DATA` tables. The subquery within the `SELECT` statement identifies the `COMMUNITY_AREA_NUMBER` with the highest crime count, and the main query then retrieves the corresponding `COMMUNITY_AREA_NAME` for that number.
 ```sql
 SELECT CD.COMMUNITY_AREA_NAME, ... FROM CHICAGO_CRIME_DATA CCA, CENSUS_DATA CD WHERE CD.COMMUNITY_AREA_NUMBER = CCA.COMMUNITY_AREA_NUMBER;
 ```
+| COMMUNITY_AREA_NAME | (SELECT...) |
+| :--- | :--- |
+| Brighton Park | 25.0 |
+| Humboldt park | 25.0 |
+| Grand Boulevard | 25.0 |
+| South Chicago | 25.0 |
+| Chicago Lawn | 25.0 |
+| . | . |
+| . | . |
+| . | . |
